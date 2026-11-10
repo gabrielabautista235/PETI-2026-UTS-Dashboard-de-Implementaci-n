@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+  <script type="module" src="/@vite/client"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PETI 2026 UTS: Dashboard de Implementación</title>
+  <meta name="description" content="Dashboard interactivo para la gestión del cronograma de implementación del PETI 2026 UTS: Integración Sistema Financiero - Academusoft.">
+  <meta property="og:title" content="PETI 2026 UTS: Dashboard de Implementación">
+  <meta property="og:description" content="Cronograma de implementación y control de actividades PETI 2026 UTS.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       VARIABLES Y RESET
+       ========================================================================== */
+    :root {
+      --bg-body: #F8FAFC;
+      --bg-card: #FFFFFF;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --text-subtle: #94A3B8;
+      --border-subtle: #E2E8F0;
+      --border-light: #F1F5F9;
+      --primary: #0F172A;
+      --primary-accent: #2563EB;
+      --primary-accent-hover: #1D4ED8;
+      
+      /* Estados Semánticos */
+      --status-done-bg: #DCFCE7;
+      --status-done-text: #166534;
+      --status-done-border: #BBF7D0;
+      
+      --status-progress-bg: #FEF3C7;
+      --status-progress-text: #92400E;
+      --status-progress-border: #FDE68A;
+      
+      --status-pending-bg: #F1F5F9;
+      --status-pending-text: #475569;
+      --status-pending-border: #E2E8F0;
+
+      /* Prioridades Semánticas */
+      --prio-alta-bg: #FEE2E2;
+      --prio-alta-text: #991B1B;
+      --prio-alta-border: #FECACA;
+
+      --prio-media-bg: #FFEDD5;
+      --prio-media-text: #9A3412;
+      --prio-media-border: #FED7AA;
+
+      --prio-baja-bg: #E0F2FE;
+      --prio-baja-text: #075985;
+      --prio-baja-border: #BAE6FD;
+
+      /* Sombras y radios */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+      --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+      --shadow-modal: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 24px 16px 64px 16px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+       TOP BANNER & HEADER
+       ========================================================================== */
+    .header-wrapper {
+      margin-bottom: 28px;
+    }
+
+    .top-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .org-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0369A1;
+      background: #F0F9FF;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      border: 1px solid #BAE6FD;
+      letter-spacing: 0.01em;
+    }
+
+    .org-badge svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FFFFFF;
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-secondary:hover {
+      background: #F8FAFC;
+      border-color: #CBD5E1;
+      color: var(--primary);
+    }
+
+    .header-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .header-info h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .header-info p {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 680px;
+    }
+
+    .header-meta-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #F8FAFC;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ==========================================================================
+       TARJETAS KPI (RESUMEN SUPERIOR)
+       ========================================================================== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .kpi-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kpi-icon.blue {
+      background: #EFF6FF;
+      color: #2563EB;
+    }
+
+    .kpi-icon.emerald {
+      background: #ECFDF5;
+      color: #059669;
+    }
+
+    .kpi-icon.purple {
+      background: #F5F3FF;
+      color: #7C3AED;
+    }
+
+    .kpi-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .kpi-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .kpi-subtext {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .progress-bar-track {
+      width: 100%;
+      height: 6px;
+      background: #E2E8F0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #10B981;
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    /* ==========================================================================
+       BARRA DE CONTROLES & FILTROS (BOTONES TIPO PILL)
+       ========================================================================== */
+    .controls-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: #F8FAFC;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .filter-pill:hover {
+      background: #F1F5F9;
+      color: var(--text-main);
+      border-color: #CBD5E1;
+    }
+
+    .filter-pill.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.12);
+    }
+
+    .pill-count {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.06);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filter-pill.active .pill-count {
+      background: rgba(255, 255, 255, 0.22);
+      color: #FFFFFF;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 260px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      font-size: 13px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      background: #F8FAFC;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.15s, background-color 0.15s;
+    }
+
+    .search-input:focus {
+      background: #FFFFFF;
+      border-color: var(--primary-accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-subtle);
+      pointer-events: none;
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ==========================================================================
+       TABLA DE DATOS MODERNA
+       ========================================================================== */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    thead {
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    th {
+      padding: 14px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    th.th-id {
+      width: 60px;
+      text-align: center;
+    }
+
+    th.th-actions {
+      text-align: right;
+      width: 100px;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: background-color 0.15s ease, opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background-color: #F8FAFC;
+    }
+
+    td {
+      padding: 16px 18px;
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    .td-id {
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .td-activity {
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    .activity-duration-tag {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .td-responsible {
+      color: #334155;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .responsible-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .resp-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: #E2E8F0;
+      color: #475569;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .week-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1E293B;
+      background: #F1F5F9;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #E2E8F0;
+      white-space: nowrap;
+    }
+
+    /* ==========================================================================
+       BADGES (ETIQUETAS) DE ESTADO Y PRIORIDAD
+       ========================================================================== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    /* Estados */
+    .badge-status-completado {
+      background-color: var(--status-done-bg);
+      color: var(--status-done-text);
+      border: 1px solid var(--status-done-border);
+    }
+
+    .badge-status-en-progreso {
+      background-color: var(--status-progress-bg);
+      color: var(--status-progress-text);
+      border: 1px solid var(--status-progress-border);
+    }
+
+    .badge-status-pendiente {
+      background-color: var(--status-pending-bg);
+      color: var(--status-pending-text);
+      border: 1px solid var(--status-pending-border);
+    }
+
+    /* Prioridades */
+    .badge-prio-alta {
+      background-color: var(--prio-alta-bg);
+      color: var(--prio-alta-text);
+      border: 1px solid var(--prio-alta-border);
+    }
+
+    .badge-prio-media {
+      background-color: var(--prio-media-bg);
+      color: var(--prio-media-text);
+      border: 1px solid var(--prio-media-border);
+    }
+
+    .badge-prio-baja {
+      background-color: var(--prio-baja-bg);
+      color: var(--prio-baja-text);
+      border: 1px solid var(--prio-baja-border);
+    }
+
+    .row-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    tbody tr:hover .row-action-btn {
+      color: var(--primary-accent);
+      background: #EFF6FF;
+      border-color: #DBEAFE;
+    }
+
+    /* Animación de filtrado suave (fade-in) */
+    .fade-in {
+      animation: fadeInRow 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInRow {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Estado vacío si no hay coincidencias */
+    .empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 12px;
+      color: var(--text-subtle);
+    }
+
+    /* ==========================================================================
+       VISTA GANTT / CRONOGRAMA SEMANAL (EXPANSIÓN VISUAL)
+       ========================================================================== */
+    .gantt-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .gantt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .gantt-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .gantt-timeline-wrapper {
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .gantt-grid {
+      min-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .gantt-weeks-row {
+      display: grid;
+      grid-template-columns: 260px repeat(8, 1fr);
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: center;
+    }
+
+    .gantt-row {
+      display: grid;
+      grid-template-columns: 260px repeat(8, 1fr);
+      gap: 4px;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+      border-radius: 6px;
+      transition: background-color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .gantt-row:hover {
+      background: #F8FAFC;
+    }
+
+    .gantt-activity-name {
+      font-weight: 500;
+      color: var(--text-main);
+      padding-right: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gantt-bar-cell {
+      height: 24px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .gantt-bar {
+      height: 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #FFFFFF;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      width: 100%;
+      letter-spacing: 0.02em;
+    }
+
+    .gantt-bar.done {
+      background: #10B981;
+    }
+
+    .gantt-bar.progress {
+      background: #F59E0B;
+    }
+
+    .gantt-bar.pending {
+      background: #94A3B8;
+    }
+
+    /* ==========================================================================
+       MODAL DE DETALLES
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      padding: 16px;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      max-width: 580px;
+      width: 100%;
+      box-shadow: var(--shadow-modal);
+      border: 1px solid var(--border-subtle);
+      transform: scale(0.96) translateY(8px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .modal-backdrop.active .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #F8FAFC;
+    }
+
+    .modal-header-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-icon-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #EFF6FF;
+      color: #2563EB;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .btn-close-modal {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s;
+    }
+
+    .btn-close-modal:hover {
+      background: #E2E8F0;
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    /* Alerta estilizada requerida */
+    .styled-alert-box {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .alert-icon {
+      color: #2563EB;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .alert-content {
+      font-size: 14px;
+      color: #1E3A8A;
+      line-height: 1.5;
+    }
+
+    .alert-content strong {
+      color: #172554;
+      font-weight: 700;
+    }
+
+    .modal-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .modal-meta-item {
+      background: #F8FAFC;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+
+    .modal-meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .modal-meta-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modal-status-selector {
+      background: #F8FAFC;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .modal-status-selector label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .status-btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .status-change-btn {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      background: #FFFFFF;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+
+    .status-change-btn:hover {
+      border-color: #94A3B8;
+    }
+
+    .status-change-btn.current {
+      border-color: var(--primary-accent);
+      background: #EFF6FF;
+      color: #1D4ED8;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      background: #F8FAFC;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #FFFFFF;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .btn-primary:hover {
+      background: #334155;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #0F172A;
+      color: #FFFFFF;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-modal);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Modal de código HTML */
+    .code-modal-pre {
+      background: #0F172A;
+      color: #E2E8F0;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      max-height: 380px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 36px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 840px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .controls-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-box {
+        min-width: 100%;
+      }
+      .header-card {
+        padding: 20px;
+      }
+      .modal-meta-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+<script src="/_aistudio-iframe.js?v=1f94f900"></script><script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@2.0.4"></script><style>.aistudio-hover-highlight { box-shadow: inset 0 0 0 0.5px white, inset 0 0 0 1.5px rgba(128,128,128,0.6) !important; }.aistudio-active-highlight { outline: 2px solid #87a9ff !important; outline-offset: -2px !important; box-shadow: 0 0 0 0.5px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(0,0,0,0.3) !important; }.aistudio-generating-blur { filter: blur(5px) grayscale(100%) brightness(28%) !important; transition: filter 0.3s ease; }#aistudio-focus-mode-tag { position: absolute; display: none; align-items: center; gap: 4px; background: #87a9ff; border-radius: 12px; z-index: 10000; padding: 8px; color: #32302c; font-family: Inter, sans-serif; font-size: 14px; font-style: normal; font-weight: 500; line-height: 21px; pointer-events: none; }#aistudio-hover-mode-tag { position: absolute; display: none; align-items: center; gap: 4px; background: rgba(128,128,128,0.6); border-radius: 12px; z-index: 10000; padding: 8px; color: white; font-family: Inter, sans-serif; font-size: 14px; font-style: normal; font-weight: 500; line-height: 21px; pointer-events: none; }.aistudio-img-icon { display: none; vertical-align: middle; pointer-events: auto; cursor: pointer; }.aistudio-img-icon.visible { display: inline-flex; }#aistudio-focus-mode-tag .aistudio-img-icon { position: relative; width: 26px; height: 26px; background: #32302c; border-radius: 6px; margin: -4px -4px -4px 0; }#aistudio-focus-mode-tag .aistudio-img-icon::before { content: ""; position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; background-color: white; -webkit-mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); mask-size: contain; mask-repeat: no-repeat; }#aistudio-hover-mode-tag .aistudio-img-icon { position: relative; width: 18px; height: 18px; margin-left: 4px; }#aistudio-hover-mode-tag .aistudio-img-icon::before { content: ""; position: absolute; top: 0; left: 0; width: 18px; height: 18px; background-color: white; -webkit-mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); mask-size: contain; mask-repeat: no-repeat; }#aistudio-focus-mode-tag .aistudio-img-icon:hover, #aistudio-hover-mode-tag .aistudio-img-icon:hover { background: #424242 !important; }#aistudio-focus-mode-tag .aistudio-img-icon:active, #aistudio-hover-mode-tag .aistudio-img-icon:active { background: #393f51 !important; }</style></head>
+<body>
+
+  <div class="container">
+    
+    <!-- HEADER WRAPPER -->
+    <header class="header-wrapper">
+      <div class="top-meta">
+        <div class="org-badge">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+          Unidades Tecnológicas de Santander · Dirección TIC &amp; Financiera
+        </div>
+        
+        <div class="actions-bar">
+          <button class="btn-secondary" id="btn-copy-code" title="Copiar el código completo de este archivo HTML">
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            Copiar Código HTML
+          </button>
+          
+          <button class="btn-secondary" id="btn-download" title="Descargar como index.html">
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Descargar .html
+          </button>
+        </div>
+      </div>
+
+      <div class="header-card">
+        <div class="header-info">
+          <h1>PETI 2026 UTS: Dashboard de Implementación</h1>
+          <p>Gestión y seguimiento del cronograma de integración entre el Sistema Financiero institucional y Academusoft. Plan Estratégico de Tecnologías de la Información.</p>
+        </div>
+        <div class="header-meta-tag">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          Horizonte: Semanas S1 a S8
+        </div>
+      </div>
+    </header>
+
+    <!-- TARJETAS KPI (RESUMEN SUPERIOR) -->
+    <section class="kpi-grid" aria-label="Tarjetas KPI Resumen Superior">
+      <!-- KPI 1: Total Actividades -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Total Actividades</span>
+          <div class="kpi-icon blue">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpi-total">8</span>
+          <span class="kpi-subtext">actividades planificadas</span>
+        </div>
+        <div class="kpi-subtext" id="kpi-status-breakdown">1 compl. · 1 en prog. · 6 pend.</div>
+      </div>
+
+      <!-- KPI 2: Completadas -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Completadas</span>
+          <div class="kpi-icon emerald">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpi-completed">1</span>
+          <span class="kpi-subtext" id="kpi-percentage">de 8 (12.5% avance)</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="kpi-progress-bar" style="width: 12.5%;"></div>
+        </div>
+      </div>
+
+      <!-- KPI 3: Semanas de Proyecto -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Semanas de Proyecto</span>
+          <div class="kpi-icon purple">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value">8</span>
+          <span class="kpi-subtext">semanas de ejecución (S1 - S8)</span>
+        </div>
+        <div class="kpi-subtext">Duración acumulada: 27 días laborables</div>
+      </div>
+    </section>
+
+    <!-- BARRA DE CONTROLES (FILTROS PILL & BÚSQUEDA) -->
+    <section class="controls-panel" aria-label="Controles de filtro">
+      <div class="filter-group" role="tablist">
+        <button class="filter-pill active" data-filter="all">
+          Todas <span class="pill-count" id="count-all">8</span>
+        </button>
+        <button class="filter-pill" data-filter="completado">
+          Completadas <span class="pill-count" id="count-completado">1</span>
+        </button>
+        <button class="filter-pill" data-filter="en-progreso">
+          En Progreso <span class="pill-count" id="count-en-progreso">1</span>
+        </button>
+        <button class="filter-pill" data-filter="pendiente">
+          Pendientes <span class="pill-count" id="count-pendiente">6</span>
+        </button>
+        <button class="filter-pill" data-filter="prioridad-alta">
+          Prioridad Alta <span class="pill-count" id="count-alta">4</span>
+        </button>
+      </div>
+
+      <div class="search-box">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar por actividad, rol o semana...">
+      </div>
+    </section>
+
+    <!-- TABLA DE DATOS MODERNA -->
+    <section class="table-card" aria-label="Tabla del cronograma">
+      <div class="table-container">
+        <table id="tasks-table">
+          <thead>
+            <tr>
+              <th class="th-id">ID</th>
+              <th>Actividad</th>
+              <th>Responsable</th>
+              <th>Prioridad</th>
+              <th>Estado</th>
+              <th>Semana</th>
+              <th class="th-actions">Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"><tr class="fade-in" data-id="1" style="animation-delay: 0s;">
+          <td class="td-id">#1</td>
+          <td>
+            <div class="td-activity">Análisis requerimientos y mapeo endpoints</div>
+            <div class="activity-duration-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Duración estimada: 4 días
+            </div>
+          </td>
+          <td class="td-responsible">
+            <div class="responsible-wrapper">
+              <span class="resp-avatar">ET</span>
+              <span>Eq. Técnico</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-prio-alta">
+              <span class="badge-dot"></span>
+              Alta
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-status-completado">
+              <span class="badge-dot"></span>
+              Completado
+            </span>
+          </td>
+          <td>
+            <span class="week-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              S1
+            </span>
+          </td>
+          <td class="th-actions">
+            <button class="row-action-btn" title="Ver detalles de la actividad">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </td>
+        </tr><tr class="fade-in" data-id="2" style="animation-delay: 0.03s;">
+          <td class="td-id">#2</td>
+          <td>
+            <div class="td-activity">Aprovisionamiento infraestructura local (Docker)</div>
+            <div class="activity-duration-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Duración estimada: 3 días
+            </div>
+          </td>
+          <td class="td-responsible">
+            <div class="responsible-wrapper">
+              <span class="resp-avatar">AI</span>
+              <span>Admin. Infra.</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-prio-alta">
+              <span class="badge-dot"></span>
+              Alta
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-status-en-progreso">
+              <span class="badge-dot"></span>
+              En progreso
+            </span>
+          </td>
+          <td>
+            <span class="week-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              S2
+            </span>
+          </td>
+          <td class="th-actions">
+            <button class="row-action-btn" title="Ver detalles de la actividad">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </td>
+        </tr><tr class="fade-in" data-id="3" style="animation-delay: 0.06s;">
+          <td class="td-id">#3</td>
+          <td>
+            <div class="td-activity">Instalación API Gateway Open Source (WSO2/Kong)</div>
+            <div class="activity-duration-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Duración estimada: 4 días
+            </div>
+          </td>
+          <td class="td-responsible">
+            <div class="responsible-wrapper">
+              <span class="resp-avatar">ID</span>
+              <span>Ing. DevOps</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-prio-alta">
+              <span class="badge-dot"></span>
+              Alta
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-status-pendiente">
+              <span class="badge-dot"></span>
+              Pendiente
+            </span>
+          </td>
+          <td>
+            <span class="week-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              S3
+            </span>
+          </td>
+          <td class="th-actions">
+            <button class="row-action-btn" title="Ver detalles de la actividad">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </td>
+        </tr><tr class="fade-in" data-id="4" style="animation-delay: 0.09s;">
+          <td class="td-id">#4</td>
+          <td>
+            <div class="td-activity">Configuración de seguridad (TLS, HTTPS, JWT)</div>
+            <div class="activity-duration-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Duración estimada: 3 días
+            </div>
+          </td>
+          <td class="td-responsible">
+            <div class="responsible-wrapper">
+              <span class="resp-avatar">EC</span>
+              <span>Esp. Ciberseguridad</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-prio-media">
+              <span class="badge-dot"></span>
+              Media
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-status-pendiente">
+              <span class="badge-dot"></span>
+              Pendiente
+            </span>
+          </td>
+          <td>
+            <span class="week-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              S4
+            </span>
+          </td>
+          <td class="th-actions">
+            <button class="row-action-btn" title="Ver detalles de la actividad">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </td>
+        </tr><tr class="fade-in" data-id="5" style="animation-delay: 0.12s;">
+          <td class="td-id">#5</td>
+          <td>
+            <div class="td-activity">Configuración Rate Limiting (Picos matrícula)</div>
+            <div class="activity-duration-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Duración estimada: 2 días
+            </div>
+          </td>
+          <td class="td-responsible">
+            <div class="responsible-wrapper">
+              <span class="resp-avatar">AS</span>
+              <span>Arq. Software</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-prio-alta">
+              <span class="badge-dot"></span>
+              Alta
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-status-pendiente">
+              <span class="badge-dot"></span>
+              Pendiente
+            </span>
+          </td>
+          <td>
+            <span class="week-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              S4 - S5
+            </span>
+          </td>
+          <td class="th-actions">
+            <button class="row-action-btn" title="Ver detalles de la actividad">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </td>
+        </tr><tr class="fade-in" data-id="6" style="animation-delay: 0.15s;">
+          <td class="td-id">#6</td>
+          <td>
+            <div class="td-activity">Desarrollo scripts integración pasarela pagos</div>
+            <div class="activity-duration-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Duración estimada: 5 días
+            </div>
+          </td>
+          <td class="td-responsible">
+            <div class="responsible-wrapper">
+              <span class="resp-avatar">DB</span>
+              <span>Dev Backend</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-prio-media">
+              <span class="badge-dot"></span>
+              Media
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-status-pendiente">
+              <span class="badge-dot"></span>
+              Pendiente
+            </span>
+          </td>
+          <td>
+            <span class="week-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              S5 - S6
+            </span>
+          </td>
+          <td class="th-actions">
+            <button class="row-action-btn" title="Ver detalles de la actividad">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </td>
+        </tr><tr class="fade-in" data-id="7" style="animation-delay: 0.18s;">
+          <td class="td-id">#7</td>
+          <td>
+            <div class="td-activity">Pruebas de aceptación (PoC) con Academusoft</div>
+            <div class="activity-duration-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Duración estimada: 4 días
+            </div>
+          </td>
+          <td class="td-responsible">
+            <div class="responsible-wrapper">
+              <span class="resp-avatar">EQ</span>
+              <span>Eq. QA</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-prio-media">
+              <span class="badge-dot"></span>
+              Media
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-status-pendiente">
+              <span class="badge-dot"></span>
+              Pendiente
+            </span>
+          </td>
+          <td>
+            <span class="week-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              S6 - S7
+            </span>
+          </td>
+          <td class="th-actions">
+            <button class="row-action-btn" title="Ver detalles de la actividad">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </td>
+        </tr><tr class="fade-in" data-id="8" style="animation-delay: 0.21s;">
+          <td class="td-id">#8</td>
+          <td>
+            <div class="td-activity">Capacitación Tesorería/TIC y Go-Live</div>
+            <div class="activity-duration-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Duración estimada: 2 días
+            </div>
+          </td>
+          <td class="td-responsible">
+            <div class="responsible-wrapper">
+              <span class="resp-avatar">GP</span>
+              <span>Gestor Proyecto</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-prio-baja">
+              <span class="badge-dot"></span>
+              Baja
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-status-pendiente">
+              <span class="badge-dot"></span>
+              Pendiente
+            </span>
+          </td>
+          <td>
+            <span class="week-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              S8
+            </span>
+          </td>
+          <td class="th-actions">
+            <button class="row-action-btn" title="Ver detalles de la actividad">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </td>
+        </tr></tbody>
+        </table>
+      </div>
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p>No se encontraron actividades que coincidan con el filtro aplicado.</p>
+      </div>
+    </section>
+
+    <!-- VISTA ADICIONAL: CRONOGRAMA GANTT SEMANAL -->
+    <section class="gantt-card" aria-label="Visualización de cronograma semanal">
+      <div class="gantt-header">
+        <div>
+          <h3>Cronograma de Ejecución Semanal (S1 - S8)</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+            Haz clic en cualquier barra o fila para ver los detalles y actualizar el estado.
+          </p>
+        </div>
+        <div style="display: flex; gap: 12px; font-size: 12px; align-items: center;">
+          <span style="display: flex; align-items: center; gap: 4px;">
+            <span style="width: 10px; height: 10px; border-radius: 2px; background: #10B981; display: inline-block;"></span> Completado
+          </span>
+          <span style="display: flex; align-items: center; gap: 4px;">
+            <span style="width: 10px; height: 10px; border-radius: 2px; background: #F59E0B; display: inline-block;"></span> En progreso
+          </span>
+          <span style="display: flex; align-items: center; gap: 4px;">
+            <span style="width: 10px; height: 10px; border-radius: 2px; background: #94A3B8; display: inline-block;"></span> Pendiente
+          </span>
+        </div>
+      </div>
+
+      <div class="gantt-timeline-wrapper">
+        <div class="gantt-grid">
+          <div class="gantt-weeks-row">
+            <div style="text-align: left; padding-left: 8px;">Actividad</div>
+            <div>S1</div>
+            <div>S2</div>
+            <div>S3</div>
+            <div>S4</div>
+            <div>S5</div>
+            <div>S6</div>
+            <div>S7</div>
+            <div>S8</div>
+          </div>
+          <div id="gantt-body"><div class="gantt-row" title="Clic para ver Análisis requerimientos y mapeo endpoints"><div class="gantt-activity-name">#1. Análisis requerimientos y mapeo endpoints</div>
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar done">4 días</div>
+              </div>
+            <div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div></div><div class="gantt-row" title="Clic para ver Aprovisionamiento infraestructura local (Docker)"><div class="gantt-activity-name">#2. Aprovisionamiento infraestructura local (Docker)</div><div class="gantt-bar-cell"></div>
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar progress">3 días</div>
+              </div>
+            <div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div></div><div class="gantt-row" title="Clic para ver Instalación API Gateway Open Source (WSO2/Kong)"><div class="gantt-activity-name">#3. Instalación API Gateway Open Source (WSO2/Kong)</div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div>
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar pending">4 días</div>
+              </div>
+            <div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div></div><div class="gantt-row" title="Clic para ver Configuración de seguridad (TLS, HTTPS, JWT)"><div class="gantt-activity-name">#4. Configuración de seguridad (TLS, HTTPS, JWT)</div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div>
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar pending">3 días</div>
+              </div>
+            <div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div></div><div class="gantt-row" title="Clic para ver Configuración Rate Limiting (Picos matrícula)"><div class="gantt-activity-name">#5. Configuración Rate Limiting (Picos matrícula)</div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div>
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar pending">2 días</div>
+              </div>
+            
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar pending">2 días</div>
+              </div>
+            <div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div></div><div class="gantt-row" title="Clic para ver Desarrollo scripts integración pasarela pagos"><div class="gantt-activity-name">#6. Desarrollo scripts integración pasarela pagos</div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div>
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar pending">5 días</div>
+              </div>
+            
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar pending">5 días</div>
+              </div>
+            <div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div></div><div class="gantt-row" title="Clic para ver Pruebas de aceptación (PoC) con Academusoft"><div class="gantt-activity-name">#7. Pruebas de aceptación (PoC) con Academusoft</div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div>
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar pending">4 días</div>
+              </div>
+            
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar pending">4 días</div>
+              </div>
+            <div class="gantt-bar-cell"></div></div><div class="gantt-row" title="Clic para ver Capacitación Tesorería/TIC y Go-Live"><div class="gantt-activity-name">#8. Capacitación Tesorería/TIC y Go-Live</div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div><div class="gantt-bar-cell"></div>
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar pending">2 días</div>
+              </div>
+            </div></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p><strong>PETI 2026 UTS</strong> · Unidades Tecnológicas de Santander · Integración Sistema Financiero &amp; Academusoft</p>
+      <p style="font-size: 12px; margin-top: 4px; color: #94A3B8;">Diseñado con arquitectura SPA Vanilla JS y CSS Moderno sin dependencias externas obligatorias.</p>
+    </footer>
+
+  </div>
+
+  <!-- ==========================================================================
+       MODAL DE DETALLES DE ACTIVIDAD
+       ========================================================================== -->
+  <div class="modal-backdrop" id="activity-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h2 id="modal-title">Detalle de Actividad</h2>
+        </div>
+        <button class="btn-close-modal" id="modal-close-btn" aria-label="Cerrar modal">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Alerta estilizada solicitada -->
+        <div class="styled-alert-box">
+          <svg class="alert-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div class="alert-content" id="modal-alert-text">
+            <!-- Texto inyectado por JS -->
+          </div>
+        </div>
+
+        <div class="modal-meta-grid">
+          <div class="modal-meta-item">
+            <div class="modal-meta-label">Responsable Asignado</div>
+            <div class="modal-meta-value" id="modal-responsible">-</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="modal-meta-label">Ventana Temporal</div>
+            <div class="modal-meta-value" id="modal-week">-</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="modal-meta-label">Nivel de Prioridad</div>
+            <div class="modal-meta-value" id="modal-priority">-</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="modal-meta-label">Estado de Ejecución</div>
+            <div class="modal-meta-value" id="modal-status">-</div>
+          </div>
+        </div>
+
+        <!-- Selector interactivo para cambiar estado -->
+        <div class="modal-status-selector">
+          <label>Actualizar Estado de la Actividad:</label>
+          <div class="status-btn-group">
+            <button type="button" class="status-change-btn" data-new-status="Completado">Completado</button>
+            <button type="button" class="status-change-btn" data-new-status="En progreso">En progreso</button>
+            <button type="button" class="status-change-btn" data-new-status="Pendiente">Pendiente</button>
+          </div>
+        </div>
+
+        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+          * Los cambios de estado actualizan en tiempo real los indicadores KPI, la barra de progreso, la tabla y el cronograma visual.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary" id="modal-confirm-btn">Entendido / Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST FLOTANTE -->
+  <div class="toast-container">
+    <div class="toast" id="toast">
+      <svg width="18" height="18" fill="none" stroke="#4ADE80" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <span id="toast-message">Operación realizada</span>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       VANILLA JAVASCRIPT
+       ========================================================================== -->
+  <script>
+    // 1. DATOS DEL PROYECTO
+    const initialTasks = [
+      {
+        id: 1,
+        actividad: "Análisis requerimientos y mapeo endpoints",
+        prioridad: "Alta",
+        responsable: "Eq. Técnico",
+        duracion: "4 días",
+        duracionDias: 4,
+        estado: "Completado",
+        semana: "S1",
+        semanasGantt: [1],
+        descripcion: "Levantamiento de especificaciones técnicas, catálogo de servicios web y mapeo de datos entre el ERP financiero y Academusoft."
+      },
+      {
+        id: 2,
+        actividad: "Aprovisionamiento infraestructura local (Docker)",
+        prioridad: "Alta",
+        responsable: "Admin. Infra.",
+        duracion: "3 días",
+        duracionDias: 3,
+        estado: "En progreso",
+        semana: "S2",
+        semanasGantt: [2],
+        descripcion: "Configuración de clúster de contenedores Docker, redes internas aisladas y volúmenes de persistencia para el entorno de middleware."
+      },
+      {
+        id: 3,
+        actividad: "Instalación API Gateway Open Source (WSO2/Kong)",
+        prioridad: "Alta",
+        responsable: "Ing. DevOps",
+        duracion: "4 días",
+        duracionDias: 4,
+        estado: "Pendiente",
+        semana: "S3",
+        semanasGantt: [3],
+        descripcion: "Despliegue de gateway para gobernanza, enrutamiento inverso y centralización de políticas de acceso entre plataformas."
+      },
+      {
+        id: 4,
+        actividad: "Configuración de seguridad (TLS, HTTPS, JWT)",
+        prioridad: "Media",
+        responsable: "Esp. Ciberseguridad",
+        duracion: "3 días",
+        duracionDias: 3,
+        estado: "Pendiente",
+        semana: "S4",
+        semanasGantt: [4],
+        descripcion: "Generación e instalación de certificados SSL/TLS, configuración de tokens JWT para autenticación stateless y firma criptográfica."
+      },
+      {
+        id: 5,
+        actividad: "Configuración Rate Limiting (Picos matrícula)",
+        prioridad: "Alta",
+        responsable: "Arq. Software",
+        duracion: "2 días",
+        duracionDias: 2,
+        estado: "Pendiente",
+        semana: "S4 - S5",
+        semanasGantt: [4, 5],
+        descripcion: "Definición de cuotas de consumo, políticas de mitigación de denegación de servicio y balanceo adaptativo para épocas de alta concurrencia."
+      },
+      {
+        id: 6,
+        actividad: "Desarrollo scripts integración pasarela pagos",
+        prioridad: "Media",
+        responsable: "Dev Backend",
+        duracion: "5 días",
+        duracionDias: 5,
+        estado: "Pendiente",
+        semana: "S5 - S6",
+        semanasGantt: [5, 6],
+        descripcion: "Codificación de webhooks, conciliación automática de recaudo bancario en tiempo real y confirmación de pago en Academusoft."
+      },
+      {
+        id: 7,
+        actividad: "Pruebas de aceptación (PoC) con Academusoft",
+        prioridad: "Media",
+        responsable: "Eq. QA",
+        duracion: "4 días",
+        duracionDias: 4,
+        estado: "Pendiente",
+        semana: "S6 - S7",
+        semanasGantt: [6, 7],
+        descripcion: "Ejecución de batería de pruebas funcionales end-to-end, pruebas de carga sintética y verificación de integridad de datos transaccionales."
+      },
+      {
+        id: 8,
+        actividad: "Capacitación Tesorería/TIC y Go-Live",
+        prioridad: "Baja",
+        responsable: "Gestor Proyecto",
+        duracion: "2 días",
+        duracionDias: 2,
+        estado: "Pendiente",
+        semana: "S8",
+        semanasGantt: [8],
+        descripcion: "Transferencia de conocimiento a los equipos de Tesorería y soporte TIC, paso a producción y monitoreo de las primeras 48 horas."
+      }
+    ];
+
+    // Estado reactivo en memoria
+    let tasks = [...initialTasks];
+    let currentFilter = 'all';
+    let searchQuery = '';
+    let selectedTaskId = null;
+
+    // Elementos DOM
+    const tableBody = document.getElementById('table-body');
+    const emptyState = document.getElementById('empty-state');
+    const ganttBody = document.getElementById('gantt-body');
+    const filterPills = document.querySelectorAll('.filter-pill');
+    const searchInput = document.getElementById('search-input');
+    
+    // KPIs
+    const kpiTotal = document.getElementById('kpi-total');
+    const kpiCompleted = document.getElementById('kpi-completed');
+    const kpiPercentage = document.getElementById('kpi-percentage');
+    const kpiProgressBar = document.getElementById('kpi-progress-bar');
+    const kpiStatusBreakdown = document.getElementById('kpi-status-breakdown');
+    
+    // Contadores en filtros
+    const countAll = document.getElementById('count-all');
+    const countCompletado = document.getElementById('count-completado');
+    const countEnProgreso = document.getElementById('count-en-progreso');
+    const countPendiente = document.getElementById('count-pendiente');
+    const countAlta = document.getElementById('count-alta');
+
+    // Modal
+    const modalBackdrop = document.getElementById('activity-modal');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+    const modalAlertText = document.getElementById('modal-alert-text');
+    const modalResponsible = document.getElementById('modal-responsible');
+    const modalWeek = document.getElementById('modal-week');
+    const modalPriority = document.getElementById('modal-priority');
+    const modalStatus = document.getElementById('modal-status');
+    const statusChangeBtns = document.querySelectorAll('.status-change-btn');
+
+    // Toast
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    let toastTimeout = null;
+
+    function showToast(msg) {
+      toastMessage.textContent = msg;
+      toast.classList.add('show');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Funciones auxiliares para badges
+    function getStatusBadgeClass(estado) {
+      switch (estado) {
+        case 'Completado': return 'badge-status-completado';
+        case 'En progreso': return 'badge-status-en-progreso';
+        case 'Pendiente': return 'badge-status-pendiente';
+        default: return 'badge-status-pendiente';
+      }
+    }
+
+    function getPriorityBadgeClass(prioridad) {
+      switch (prioridad) {
+        case 'Alta': return 'badge-prio-alta';
+        case 'Media': return 'badge-prio-media';
+        case 'Baja': return 'badge-prio-baja';
+        default: return 'badge-prio-baja';
+      }
+    }
+
+    function getInitials(name) {
+      return name.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    // Actualización de KPIs y contadores
+    function updateKPIs() {
+      const total = tasks.length;
+      const completed = tasks.filter(t => t.estado === 'Completado').length;
+      const inProgress = tasks.filter(t => t.estado === 'En progreso').length;
+      const pending = tasks.filter(t => t.estado === 'Pendiente').length;
+      const highPriority = tasks.filter(t => t.prioridad === 'Alta').length;
+
+      const pct = total > 0 ? ((completed / total) * 100).toFixed(1) : 0;
+
+      kpiTotal.textContent = total;
+      kpiCompleted.textContent = completed;
+      kpiPercentage.textContent = `de ${total} (${pct}% avance)`;
+      kpiProgressBar.style.width = `${pct}%`;
+      kpiStatusBreakdown.textContent = `${completed} compl. · ${inProgress} en prog. · ${pending} pend.`;
+
+      // Contadores en los botones de filtro
+      countAll.textContent = total;
+      countCompletado.textContent = completed;
+      countEnProgreso.textContent = inProgress;
+      countPendiente.textContent = pending;
+      countAlta.textContent = highPriority;
+    }
+
+    // Filtrar tareas
+    function getFilteredTasks() {
+      return tasks.filter(task => {
+        // Filtro por píldora activa
+        let matchesFilter = true;
+        if (currentFilter === 'completado') {
+          matchesFilter = task.estado === 'Completado';
+        } else if (currentFilter === 'en-progreso') {
+          matchesFilter = task.estado === 'En progreso';
+        } else if (currentFilter === 'pendiente') {
+          matchesFilter = task.estado === 'Pendiente';
+        } else if (currentFilter === 'prioridad-alta') {
+          matchesFilter = task.prioridad === 'Alta';
+        }
+
+        // Filtro por búsqueda de texto
+        let matchesSearch = true;
+        if (searchQuery.trim() !== '') {
+          const q = searchQuery.toLowerCase();
+          matchesSearch = task.actividad.toLowerCase().includes(q) ||
+                          task.responsable.toLowerCase().includes(q) ||
+                          task.semana.toLowerCase().includes(q) ||
+                          task.duracion.toLowerCase().includes(q);
+        }
+
+        return matchesFilter && matchesSearch;
+      });
+    }
+
+    // Renderizado de la tabla con transición suave
+    function renderTable() {
+      const filtered = getFilteredTasks();
+      tableBody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      } else {
+        emptyState.style.display = 'none';
+      }
+
+      filtered.forEach((task, index) => {
+        const tr = document.createElement('tr');
+        tr.className = 'fade-in';
+        tr.style.animationDelay = `${index * 0.03}s`;
+        tr.setAttribute('data-id', task.id);
+
+        tr.innerHTML = `
+          <td class="td-id">#${task.id}</td>
+          <td>
+            <div class="td-activity">${task.actividad}</div>
+            <div class="activity-duration-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Duración estimada: ${task.duracion}
+            </div>
+          </td>
+          <td class="td-responsible">
+            <div class="responsible-wrapper">
+              <span class="resp-avatar">${getInitials(task.responsable)}</span>
+              <span>${task.responsable}</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge ${getPriorityBadgeClass(task.prioridad)}">
+              <span class="badge-dot"></span>
+              ${task.prioridad}
+            </span>
+          </td>
+          <td>
+            <span class="badge ${getStatusBadgeClass(task.estado)}">
+              <span class="badge-dot"></span>
+              ${task.estado}
+            </span>
+          </td>
+          <td>
+            <span class="week-tag">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              ${task.semana}
+            </span>
+          </td>
+          <td class="th-actions">
+            <button class="row-action-btn" title="Ver detalles de la actividad">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </td>
+        `;
+
+        // Evento click en la fila para abrir el modal estilizado
+        tr.addEventListener('click', () => {
+          openTaskModal(task.id);
+        });
+
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // Renderizado del Gantt semanal
+    function renderGantt() {
+      ganttBody.innerHTML = '';
+      tasks.forEach(task => {
+        const row = document.createElement('div');
+        row.className = 'gantt-row';
+        row.title = `Clic para ver ${task.actividad}`;
+
+        let statusClass = 'pending';
+        if (task.estado === 'Completado') statusClass = 'done';
+        if (task.estado === 'En progreso') statusClass = 'progress';
+
+        let cellsHtml = `<div class="gantt-activity-name">#${task.id}. ${task.actividad}</div>`;
+        for (let w = 1; w <= 8; w++) {
+          const isWeekIncluded = task.semanasGantt.includes(w);
+          if (isWeekIncluded) {
+            cellsHtml += `
+              <div class="gantt-bar-cell">
+                <div class="gantt-bar ${statusClass}">${task.duracion}</div>
+              </div>
+            `;
+          } else {
+            cellsHtml += `<div class="gantt-bar-cell"></div>`;
+          }
+        }
+
+        row.innerHTML = cellsHtml;
+        row.addEventListener('click', () => {
+          openTaskModal(task.id);
+        });
+        ganttBody.appendChild(row);
+      });
+    }
+
+    // Abrir modal con la alerta estilizada solicitada:
+    // "Detalles adicionales de la actividad: [Nombre Actividad]. Duración: [Duración]"
+    function openTaskModal(taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+      selectedTaskId = taskId;
+
+      // Mensaje textual exacto solicitado con estilo visual premium
+      modalAlertText.innerHTML = `
+        <strong>Detalles adicionales de la actividad:</strong> ${task.actividad}.<br />
+        <strong>Duración:</strong> ${task.duracion} (${task.duracionDias} días calendario).
+      `;
+
+      modalResponsible.textContent = task.responsable;
+      modalWeek.textContent = task.semana;
+      
+      modalPriority.innerHTML = `
+        <span class="badge ${getPriorityBadgeClass(task.prioridad)}">
+          <span class="badge-dot"></span>
+          ${task.prioridad}
+        </span>
+      `;
+
+      modalStatus.innerHTML = `
+        <span class="badge ${getStatusBadgeClass(task.estado)}">
+          <span class="badge-dot"></span>
+          ${task.estado}
+        </span>
+      `;
+
+      // Sincronizar botones de cambio de estado
+      statusChangeBtns.forEach(btn => {
+        if (btn.getAttribute('data-new-status') === task.estado) {
+          btn.classList.add('current');
+        } else {
+          btn.classList.remove('current');
+        }
+      });
+
+      modalBackdrop.classList.add('active');
+    }
+
+    function closeModal() {
+      modalBackdrop.classList.remove('active');
+      selectedTaskId = null;
+    }
+
+    // Manejador para cambiar estado de una actividad
+    statusChangeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        if (!selectedTaskId) return;
+        const newStatus = e.currentTarget.getAttribute('data-new-status');
+        const task = tasks.find(t => t.id === selectedTaskId);
+        if (task && task.estado !== newStatus) {
+          task.estado = newStatus;
+          updateKPIs();
+          renderTable();
+          renderGantt();
+          openTaskModal(selectedTaskId); // refrescar contenido modal
+          showToast(`Estado actualizado a: ${newStatus}`);
+        }
+      });
+    });
+
+    // Eventos de los filtros Pill
+    filterPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        filterPills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        currentFilter = pill.getAttribute('data-filter');
+        renderTable();
+      });
+    });
+
+    // Evento de búsqueda
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderTable();
+    });
+
+    // Cerrar modal
+    modalCloseBtn.addEventListener('click', closeModal);
+    modalConfirmBtn.addEventListener('click', closeModal);
+
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modalBackdrop.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    // Botón Copiar Código HTML (Single File)
+    document.getElementById('btn-copy-code').addEventListener('click', () => {
+      const fullHtml = document.documentElement.outerHTML;
+      navigator.clipboard.writeText('<!DOCTYPE html>\n' + fullHtml).then(() => {
+        showToast('¡Código HTML completo copiado al portapapeles!');
+      }).catch(() => {
+        showToast('Error al copiar el código al portapapeles.');
+      });
+    });
+
+    // Botón Descargar index.html
+    document.getElementById('btn-download').addEventListener('click', () => {
+      const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Descargando archivo index.html...');
+    });
+
+    // Inicialización al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      updateKPIs();
+      renderTable();
+      renderGantt();
+    });
+
+    // Ejecución inmediata si el DOM ya está listo
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+      updateKPIs();
+      renderTable();
+      renderGantt();
+    }
+  </script>
+
+
+<span id="PING_CONTENT_PUSH_NOTIFICATION" style="display: none;"></span></body></html>
